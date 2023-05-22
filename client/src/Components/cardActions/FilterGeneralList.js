@@ -8,13 +8,40 @@ import ru from "date-fns/locale/ru";
 import moment from "moment";
 import { fetchRecords } from "../../http/cardInfoAPI";
 import { RenderContext } from "../GeneralList";
+import { Context } from "../..";
 
 const FilterGeneralList = observer(() => {
   const { forceRender, setForceRender } = useContext(RenderContext);
+  const { userInfo } = useContext(Context);
+  const userRoleIsChecker = userInfo.userRole === "checker";
+  const userRoleIsUser = userInfo.userRole === "user";
 
   registerLocale("ru", ru);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
+  const changingDate = (setFunction, defaultDate) => (value) => {
+    setFunction(value);
+    value =
+      value === null ? moment(defaultDate, "DD-MM-YYYY", true).format() : value;
+    homeGeneral.setFilterPropeties("endCallDate", value);
+    fetchRecords(
+      homeGeneral.filterPropeties,
+      homeGeneral.page,
+      homeGeneral.limit
+    );
+    setForceRender(!forceRender);
+  };
+
+  const changingStringInput = (category) => (e) => {
+    homeGeneral.setFilterPropeties(category, e.target.value);
+    fetchRecords(
+      homeGeneral.filterPropeties,
+      homeGeneral.page,
+      homeGeneral.limit
+    );
+    setForceRender(!forceRender);
+  };
 
   return (
     <>
@@ -26,22 +53,10 @@ const FilterGeneralList = observer(() => {
                 <Form.Label>{selector.naming}</Form.Label>
                 <Form.Select
                   name={selector.category}
-                  onChange={(e) => {
-                    // homeGeneral.filterList(selector.category, e.target.value)
-                    homeGeneral.setFilterPropeties(
-                      selector.category,
-                      e.target.value
-                    );
-                    fetchRecords(
-                      homeGeneral.filterPropeties,
-                      homeGeneral.page,
-                      homeGeneral.limit
-                    );
-                    setForceRender(!forceRender);
-                  }}
+                  onChange={changingStringInput(selector.category)}
                 >
                   <option key={"choose"} value={"null"}>
-                    Всё
+                    все
                   </option>
                   {selector.options.map((option, index) => {
                     return (
@@ -55,30 +70,44 @@ const FilterGeneralList = observer(() => {
             );
           })}
           <Form.Group as={Col}>
+            <Form.Label>Текущий статус карточки</Form.Label>
+            <Form.Select
+              name="currentState"
+              onChange={changingStringInput("currentState")}
+            >
+              <option key={"choose"} value={"null"}>
+                все
+              </option>
+              <option key={"ready"} value={"checked"}>
+                готовые
+              </option>
+              {userRoleIsUser ? (
+                <option key={"editing"} value={"userEdit"}>
+                  редактируемые
+                </option>
+              ) : null}
+
+              {userRoleIsChecker ? (
+                <option key={"checking"} value={"checkerEdit"}>
+                  проверяемые
+                </option>
+              ) : null}
+            </Form.Select>
+          </Form.Group>
+          <Form.Group as={Col}>
             <Row className="mb-3">
               <Form.Group as={Col}>
                 <Form.Label>Начальная дата</Form.Label>
                 <DatePicker
                   selected={startDate}
-                  onChange={(value) => {
-                    setStartDate(value);
+                  onChange={
+                    changingDate(setStartDate, "01-01-1970")
                     //присвоение малого значения переменной уже переданной в стейт, то есть и в инпут, чтобы не засорять логику filterList еще больше
-                    value =
-                      value === null
-                        ? moment("01-01-1970", "DD-MM-YYYY", true).format()
-                        : value;
-                    homeGeneral.setFilterPropeties("startCallDate", value);
-                    fetchRecords(
-                      homeGeneral.filterPropeties,
-                      homeGeneral.page,
-                      homeGeneral.limit
-                    );
-                    setForceRender(!forceRender);
-                  }}
+                  }
                   locale="ru"
                   dateFormat="dd.MM.yyyy"
                   selectsStart
-                  maxDate={endDate}
+                  maxDate={endDate === null ? new Date() : endDate}
                   placeholderText="Начало"
                 />
               </Form.Group>
@@ -86,29 +115,15 @@ const FilterGeneralList = observer(() => {
                 <Form.Label>Конечная дата</Form.Label>
                 <DatePicker
                   selected={endDate}
-                  onChange={(value) => {
-                    setEndDate(value);
-                    //присвоение большого значения переменной уже переданной в стейт, то есть и в инпут, чтобы не засорять логику filterList еще больше
-                    value =
-                      value === null
-                        ? moment(
-                            moment().format("DD-MM-YYYY"),
-                            "DD-MM-YYYY",
-                            true
-                          ).format()
-                        : value;
-                    homeGeneral.setFilterPropeties("endCallDate", value);
-                    fetchRecords(
-                      homeGeneral.filterPropeties,
-                      homeGeneral.page,
-                      homeGeneral.limit
-                    );
-                    setForceRender(!forceRender);
-                  }}
+                  onChange={
+                    changingDate(setEndDate, moment().format("DD-MM-YYYY"))
+                    //присвоение большого значения переменной уже переданной в стейт, то есть и в инпут, чтобы не засорять логику filterList еще больше}
+                  }
                   locale="ru"
                   dateFormat="dd.MM.yyyy"
                   selectsEnd
                   minDate={startDate}
+                  maxDate={new Date()}
                   placeholderText="Конец"
                 />
               </Form.Group>

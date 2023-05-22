@@ -1,5 +1,4 @@
 import { makeAutoObservable } from "mobx";
-import { SORT_ASC, SORT_DESC } from "../utils/consts";
 import moment from "moment";
 
 //TODO выяснить, нужна ли приписка (город, посёлок, деревня,...) к населённому пункту
@@ -9,6 +8,7 @@ class HomeGeneralStore {
     this._generals = [];
 
     this._generals_head = [
+      { naming: "Текущее состояние", id: "currentState" },
       { naming: "Ранг пожара", id: "callNumber" },
       { naming: "Дата", id: "callDate" },
       { naming: "Населённый пункт", id: "settlement" },
@@ -33,6 +33,7 @@ class HomeGeneralStore {
       ).format(),
       callNumber: "null",
       settlement: "null",
+      currentState: "null",
     };
 
     this._generals_filter = [
@@ -156,14 +157,14 @@ class HomeGeneralStore {
   //! меняет порядок сортировки даже при клике на другой столбец
   //экшены
   toggleSortDir(name) {
-    this.setSortOrder(this._sortOrder === SORT_ASC ? SORT_DESC : SORT_ASC);
+    this.setSortOrder(this._sortOrder === "asc" ? "desc" : "asc");
     this.setSortBy(name);
   }
 
   //вычисляемые функции
   get sortedGeneral() {
     return this._generals.slice().sort((a, b) => {
-      const sortOrder = this._sortOrder === SORT_ASC ? 1 : -1; //множитель, позволяющий не дублировать код при изменении порядка сортировки
+      const sortOrder = this._sortOrder === "asc" ? 1 : -1; //множитель, позволяющий не дублировать код при изменении порядка сортировки
       const aValue = a[this._sortBy];
       const bValue = b[this._sortBy];
 

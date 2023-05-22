@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import React, { useEffect, createContext, useState, useContext } from "react";
 import { Table } from "react-bootstrap";
-import { SORT_ASC, SORT_DESC } from "../utils/consts";
 import ButtonList from "./cardActions/ButtonList";
 import FilterGeneralList from "./cardActions/FilterGeneralList";
 import { fetchRecords } from "../http/cardInfoAPI";
@@ -9,6 +8,7 @@ import moment from "moment";
 import CreatingButton from "./cardActions/CreatingButton";
 import Pages from "./Pages";
 import { GeneralContext } from "./AppRouter";
+import { Context } from "../index";
 
 //TODO Добавить выделение границ строки при нажатии + сделать более явной подсветку при наведении
 //TODO Добавить выделение границ столбца, по которому идёт сортировка
@@ -16,9 +16,24 @@ import { GeneralContext } from "./AppRouter";
 export const RenderContext = createContext(null);
 
 const GeneralList = observer(() => {
+  const { userInfo } = useContext(Context);
   const { homeGeneral } = useContext(GeneralContext);
 
   const [forceRender, setForceRender] = useState(false);
+  const userRoleIsUser = userInfo.userRole === "user";
+
+  const changeCurrentStateName = (currentStateName) => {
+    switch (currentStateName) {
+      case "userEdit":
+        return "редактируемый";
+      case "checkerEdit":
+        return "проверяемый";
+      case "checked":
+        return "готовый";
+      default:
+        return "-";
+    }
+  };
 
   useEffect(() => {
     fetchRecords(homeGeneral.filterPropeties, homeGeneral.page, 10).then(
@@ -36,7 +51,7 @@ const GeneralList = observer(() => {
   return (
     <RenderContext.Provider value={{ forceRender, setForceRender }}>
       <FilterGeneralList />
-      <CreatingButton />
+      {userRoleIsUser && <CreatingButton />}
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -53,9 +68,9 @@ const GeneralList = observer(() => {
                   {generalHead.naming}
 
                   {homeGeneral.sortBy === generalHead.id &&
-                    homeGeneral.sortOrder === SORT_ASC && <span>&darr;</span>}
+                    homeGeneral.sortOrder === "asc" && <span>&darr;</span>}
                   {homeGeneral.sortBy === generalHead.id &&
-                    homeGeneral.sortOrder === SORT_DESC && <span>&uarr;</span>}
+                    homeGeneral.sortOrder === "desc" && <span>&uarr;</span>}
                 </th>
               );
             })}
@@ -74,14 +89,16 @@ const GeneralList = observer(() => {
                 // active={general.cardId === homeGeneral.selectedGeneral.cardId}
               >
                 <td>{index + 1}</td>
+                <td>{changeCurrentStateName(general.currentState)}</td>
                 <td>{general.callNumber}</td>
                 <td>{general.callDate}</td>
                 <td>{general.settlement}</td>
                 <td>{general.address}</td>
                 <td style={{ maxWidth: "350px" }}>{general.objectName}</td>
-                <td>
-                  <ButtonList cardId={general.cardId} />
-                </td>
+                <ButtonList
+                  cardId={general.cardId}
+                  currentState={general.currentState}
+                />
               </tr>
             );
           })}

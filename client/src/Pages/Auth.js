@@ -8,12 +8,13 @@ import { observer } from "mobx-react-lite";
 import { Context } from "../index";
 
 const Auth = observer(() => {
-  const { user } = useContext(Context);
+  const { userInfo } = useContext(Context);
   const location = useLocation();
   const navigate = useNavigate();
   const isLogin = location.pathname === LOGIN_ROUTE;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
 
   const click = async () => {
     try {
@@ -21,10 +22,10 @@ const Auth = observer(() => {
       if (isLogin) {
         data = await login(email, password);
       } else {
-        data = await registration(email, password);
+        data = await registration(email, password, role);
       }
-      user.setUser(data);
-      user.setIsAuth(true);
+      userInfo.setUser(data);
+      userInfo.setIsAuth(true);
       navigate(HOME_ROUTE);
     } catch (e) {
       alert(e.response.data.message);
@@ -52,6 +53,30 @@ const Auth = observer(() => {
             onChange={(e) => setPassword(e.target.value)}
             type="password"
           />
+          {!isLogin ? (
+            <Row className="d-flex justify-content-between mt-3 pr-3 pl-3">
+              <Col xs={2}>
+                <Form.Check
+                  inline
+                  value="user"
+                  name="roleButton"
+                  type={"radio"}
+                  label={"заполнитель"}
+                  onChange={(e) => setRole(e.target.value)}
+                />
+              </Col>
+              <Col xs={9}>
+                <Form.Check
+                  inline
+                  value="checker"
+                  name="roleButton"
+                  type={"radio"}
+                  label={"проверяющий"}
+                  onChange={(e) => setRole(e.target.value)}
+                />
+              </Col>
+            </Row>
+          ) : null}
           <Row className="d-flex justify-content-between mt-3 pr-3 pl-3">
             <Col xs={12} md={8}>
               {isLogin ? (

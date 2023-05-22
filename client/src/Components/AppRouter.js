@@ -9,11 +9,11 @@ import homeGeneral from "../store/HomeGeneralStore";
 export const GeneralContext = createContext(null);
 
 const AppRouter = observer(() => {
-  const { user } = useContext(Context);
+  const { userInfo } = useContext(Context);
 
   return (
     <Routes>
-      {user.isAuth &&
+      {userInfo.isAuth ? (
         authRoutes.map(({ path, Component }) => (
           <Route
             key={path}
@@ -25,7 +25,10 @@ const AppRouter = observer(() => {
             }
             exact
           />
-        ))}
+        ))
+      ) : (
+        <Route element={<Navigate to={LOGIN_ROUTE} />} />
+      )}
 
       {publicRoutes.map(({ path, Component }) => (
         <Route key={path} path={path} element={<Component />} exact />

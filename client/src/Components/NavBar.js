@@ -11,12 +11,12 @@ import { observer } from "mobx-react-lite";
 //TODO в константах нужно имя "token" сделать для потенциального расширения localStorage пользовательскими данными (ФИО, должность итд) + если будет необходимость изменить систему регистрации/авторизации в пользу refresh-токенов
 
 const NavBar = observer(() => {
-  const { user } = useContext(Context);
+  const { userInfo } = useContext(Context);
   const navigate = useNavigate();
 
   const logOut = () => {
-    user.setUser({});
-    user.setIsAuth(false);
+    userInfo.setUser({});
+    userInfo.setIsAuth(false);
     localStorage.removeItem("token");
   };
 
@@ -34,7 +34,7 @@ const NavBar = observer(() => {
         >
           Городские пожары
         </NavLink>
-        {user.isAuth ? (
+        {userInfo.isAuth ? (
           <Nav className="ms-auto" style={{ color: "white" }}>
             {window.location.pathname !== "/" ? (
               <Button variant={"outline-light"} href={HOME_ROUTE}>
@@ -59,12 +59,3 @@ const NavBar = observer(() => {
 });
 
 export default NavBar;
-
-/* <Nav className="ms-auto" style={{ color: "white" }}>
-<Button
-  variant={"outline-light"}
-  onClick={() => navigate(LOGIN_ROUTE)}
->
-  Авторизация
-</Button>
-</Nav> */

@@ -1,7 +1,7 @@
 import { $authHost } from "./index";
 
-export const createRecord = async (record) => {
-  const { data } = await $authHost.post("api/general", record);
+export const createAllTables = async (record) => {
+  const { data } = await $authHost.post("api/allTables", record);
   return data;
 };
 

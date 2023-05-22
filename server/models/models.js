@@ -1,238 +1,189 @@
-const sequelize = require("../db");
+const sequelize = require("../db.js");
 const { DataTypes } = require("sequelize");
+const { General, GeneralComment } = require("./general.js");
+const {
+  FireTimeindicators,
+  FireTimeindicatorsComment,
+} = require("./fireTimeindicators.js");
+const { WaterSupply, WaterSupplyComment } = require("./waterSupply.js");
+const { FireSituation, FireSituationComment } = require("./fireSituation.js");
+const {
+  ActionsEvaluation,
+  ActionsEvaluationComment,
+} = require("./actionsEvaluation.js");
+const {
+  FeaturesOfFireExtinguishing,
+  FeaturesOfFireExtinguishingComment,
+} = require("./featuresOfFireExtinguishing.js");
+const {
+  FireExtinguishPersonnel,
+  FireExtinguishPersonnelComment,
+} = require("./fireExtinguishPersonnel.js");
+const { FireOthers, FireOthersComment } = require("./fireOthers.js");
+const { FireResults, FireResultsComment } = require("./fireResults.js");
+const {
+  ReportConclusion,
+  ReportConclusionComment,
+} = require("./reportConclusion.js");
+const {
+  ApplicationName,
+  ApplicationNameComment,
+} = require("./applicationName.js");
+const {
+  ApplicationImage,
+  ApplicationImageComment,
+} = require("./applicationImage.js");
+const { User } = require("./user.js");
 
 //TODO objectCharacteristic и objectDetection- обсудить с заказчиком возможность разбития сущности на составные элементы
 
-//! убрать measuresTaken из card_author в отдельную таблицу
-
-const User = sequelize.define(
-  "user",
-  {
-    userId: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    email: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    role: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  { timestamps: false }
-);
-
-const General = sequelize.define(
-  "general_data",
-  {
-    cardId: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-
-    userId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: User,
-        key: "userId",
-      },
-    },
-
-    callNumber: {
-      type: DataTypes.STRING,
-    },
-
-    shift: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-
-    callDate: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-
-    objectName: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-
-    settlement: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
-    address: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
-    objectCharacteristic: {
-      type: DataTypes.TEXT,
-    },
-
-    objectDetection: {
-      type: DataTypes.TEXT,
-    },
-  },
-  { timestamps: false }
-);
-
-const CardAuthor = sequelize.define(
-  "card_author",
-  {
-    cardId: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      references: {
-        model: General,
-        key: "cardId",
-      },
-    },
-    measuresTaken: {
-      type: DataTypes.STRING,
-    },
-    positionAuthor: {
-      type: DataTypes.STRING,
-    },
-    fullNameAuthor: {
-      type: DataTypes.STRING,
-    },
-  },
-  { timestamps: false }
-);
-
-const FireExtinguishingImage = sequelize.define(
-  "fire_extinguish_image",
-  {
-    cardId: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      references: {
-        model: General,
-        key: "cardId",
-      },
-    },
-    image: {
-      type: DataTypes.STRING,
-    },
-    signature: {
-      type: DataTypes.STRING,
-    },
-    applicationsName: {
-      type: DataTypes.STRING,
-    },
-  },
-  { timestamps: false }
-);
-
-const FireTimeindicators = sequelize.define(
-  "fire_timeindicators",
-  {
-    cardId: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      references: {
-        model: General,
-        key: "cardId",
-      },
-    },
-    fireOccurrenceTime: {
-      type: DataTypes.TIME,
-    },
-    fireOccurrenceSq: {
-      type: DataTypes.INTEGER,
-    },
-
-    fireDetectionTime: {
-      type: DataTypes.TIME,
-    },
-    fireDetectionSq: {
-      type: DataTypes.INTEGER,
-    },
-
-    fireMessageTime: {
-      type: DataTypes.TIME,
-    },
-    fireMessageSq: {
-      type: DataTypes.INTEGER,
-    },
-
-    departureTime: {
-      type: DataTypes.TIME,
-    },
-
-    fireArrivalTime: {
-      type: DataTypes.TIME,
-    },
-    fireArrivalSq: {
-      type: DataTypes.INTEGER,
-    },
-
-    firstBarrelTime: {
-      type: DataTypes.TIME,
-    },
-    firstBarrelSq: {
-      type: DataTypes.INTEGER,
-    },
-
-    additionalForcesTime: {
-      type: DataTypes.TIME,
-    },
-    additionalForcesSq: {
-      type: DataTypes.INTEGER,
-    },
-
-    localizationTime: {
-      type: DataTypes.TIME,
-    },
-    localizationSq: {
-      type: DataTypes.INTEGER,
-    },
-
-    openFireEliminationTime: {
-      type: DataTypes.TIME,
-    },
-    openFireEliminationSq: {
-      type: DataTypes.INTEGER,
-    },
-
-    fireConsequencesEliminationTime: {
-      type: DataTypes.TIME,
-    },
-
-    firestationReturnTime: {
-      type: DataTypes.TIME,
-    },
-  },
-  { timestamps: false }
-);
-
-General.hasOne(CardAuthor, { foreignKey: "cardId" });
-CardAuthor.belongsTo(General, { foreignKey: "cardId" });
-
-General.hasOne(FireTimeindicators, { foreignKey: "cardId" });
-FireTimeindicators.belongsTo(General, { foreignKey: "cardId" });
-
-General.hasMany(FireExtinguishingImage, { foreignKey: "cardId" });
-FireExtinguishingImage.belongsTo(General, { foreignKey: "cardId" });
-
 User.hasMany(General, { foreignKey: "userId" });
 General.belongsTo(User, { foreignKey: "userId" });
+General.hasOne(GeneralComment, { foreignKey: "cardId", onDelete: "CASCADE" });
+GeneralComment.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasOne(FireTimeindicators, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+FireTimeindicators.belongsTo(General, { foreignKey: "cardId" });
+General.hasOne(FireTimeindicatorsComment, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+FireTimeindicatorsComment.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasOne(WaterSupply, { foreignKey: "cardId", onDelete: "CASCADE" });
+WaterSupply.belongsTo(General, { foreignKey: "cardId" });
+General.hasOne(WaterSupplyComment, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+WaterSupplyComment.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasOne(FireSituation, { foreignKey: "cardId", onDelete: "CASCADE" });
+FireSituation.belongsTo(General, { foreignKey: "cardId" });
+General.hasOne(FireSituationComment, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+FireSituationComment.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasOne(ActionsEvaluation, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+ActionsEvaluation.belongsTo(General, { foreignKey: "cardId" });
+General.hasOne(ActionsEvaluationComment, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+ActionsEvaluationComment.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasOne(FeaturesOfFireExtinguishing, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+FeaturesOfFireExtinguishing.belongsTo(General, { foreignKey: "cardId" });
+General.hasOne(FeaturesOfFireExtinguishingComment, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+FeaturesOfFireExtinguishingComment.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasOne(FireExtinguishPersonnel, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+FireExtinguishPersonnel.belongsTo(General, { foreignKey: "cardId" });
+General.hasOne(FireExtinguishPersonnelComment, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+FireExtinguishPersonnelComment.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasOne(FireOthers, { foreignKey: "cardId", onDelete: "CASCADE" });
+FireOthers.belongsTo(General, { foreignKey: "cardId" });
+General.hasOne(FireOthersComment, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+FireOthersComment.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasOne(FireResults, { foreignKey: "cardId", onDelete: "CASCADE" });
+FireResults.belongsTo(General, { foreignKey: "cardId" });
+General.hasOne(FireResultsComment, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+FireResultsComment.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasOne(ReportConclusion, { foreignKey: "cardId", onDelete: "CASCADE" });
+ReportConclusion.belongsTo(General, { foreignKey: "cardId" });
+General.hasOne(ReportConclusionComment, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+ReportConclusionComment.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasOne(ApplicationName, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+ApplicationName.belongsTo(General, { foreignKey: "cardId" });
+General.hasOne(ApplicationNameComment, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+ApplicationNameComment.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasMany(ApplicationImage, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+ApplicationImage.belongsTo(General, { foreignKey: "cardId" });
+
+General.hasMany(ApplicationImageComment, {
+  foreignKey: "cardId",
+  onDelete: "CASCADE",
+});
+ApplicationImage.hasOne(ApplicationImageComment, {
+  foreignKey: "applicationImageId",
+  onDelete: "CASCADE",
+});
+ApplicationImageComment.belongsTo(
+  General,
+  { foreignKey: "cardId" },
+  ApplicationImage,
+  {
+    foreignKey: "applicationImageId",
+  }
+);
 
 module.exports = {
-  General,
-  CardAuthor,
   User,
-  FireExtinguishingImage,
+  General,
+  GeneralComment,
   FireTimeindicators,
+  FireTimeindicatorsComment,
+  WaterSupply,
+  WaterSupplyComment,
+  FireSituation,
+  FireSituationComment,
+  ActionsEvaluation,
+  ActionsEvaluationComment,
+  FeaturesOfFireExtinguishing,
+  FeaturesOfFireExtinguishingComment,
+  FireExtinguishPersonnel,
+  FireExtinguishPersonnelComment,
+  FireOthers,
+  FireOthersComment,
+  FireResults,
+  FireResultsComment,
+  ReportConclusion,
+  ReportConclusionComment,
+  ApplicationName,
+  ApplicationNameComment,
+  ApplicationImage,
+  ApplicationImageComment,
 };

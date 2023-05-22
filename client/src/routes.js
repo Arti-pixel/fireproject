@@ -12,11 +12,10 @@ import {
 export const authRoutes = [
   { path: HOME_ROUTE, Component: Home },
   { path: CARD_ROUTE + "/:cardId", Component: Card },
+  { path: CARD_ROUTE + "/:cardId", Component: Card },
 ];
 
 export const publicRoutes = [
-  { path: HOME_ROUTE, Component: Home },
-  { path: CARD_ROUTE + "/:cardId", Component: Card },
   { path: LOGIN_ROUTE, Component: Auth },
   { path: REGISTRATION_ROUTE, Component: Auth },
 ];

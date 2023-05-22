@@ -1,14 +1,27 @@
-import { observer } from "mobx-react-lite";
-import React, { useEffect, useState, forwardRef } from "react";
-import { Form, Row, Col, Button, Container, Card } from "react-bootstrap";
+import React, { useState, forwardRef, useContext } from "react";
+import { Form } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import {
   fetchFireTimeindicators,
   updateFireTimeindicators,
-} from "../../http/formsAPI/fireTimeindicatorsFormAPI";
+} from "../../http/formsAPI/formsContentAPI/fireTimeindicatorsFormAPI";
+import {
+  fetchFireTimeindicatorsComment,
+  updateFireTimeindicatorsComment,
+} from "../../http/formsAPI/formsCommentAPI/fireTimeindicatorsFormCommentAPI";
+import { FireGeneralContext } from "../../Pages/Card";
+import useFetch from "../../Hooks/useFetch";
+import FormWrapper from "./formWrapper/FormWrapper";
+import HeadLabelFireTimeRow from "./formRows/HeadLabelFireTimeRow";
+import submitFormFunction from "../../Helpers/submitFormFunction";
+import OneTimeDateAndOneNumberRow from "./formRows/OneTimeDateAndOneNumberRow";
+import OneTimeDateRow from "./formRows/OneTimeDateRow";
+import FormSendButton from "./formSendButton/FormSendButton";
 
 const FireTimeindicatorsForm = forwardRef(({}, ref) => {
+  const { userRoleIsChecker } = useContext(FireGeneralContext);
   let { cardId } = useParams();
+
   const [fireTime, setFireTime] = useState({
     fireOccurrenceTime: null,
     fireOccurrenceSq: null,
@@ -29,400 +42,210 @@ const FireTimeindicatorsForm = forwardRef(({}, ref) => {
     openFireEliminationSq: null,
     fireConsequencesEliminationTime: null,
     firestationReturnTime: null,
+    hasComments: false,
   });
 
-  useEffect(() => {
-    fetchFireTimeindicators(cardId).then((data) => {
-      for (const element in data) {
-        setFireTime((prevState) => ({
-          ...prevState,
-          [element]: data[element],
-        }));
-      }
+  const [fireTimeComment, setFireTimeComment] = useState({
+    fireOccurrenceComment: null,
+    fireDetectionComment: null,
+    fireMessageComment: null,
+    departureTimeComment: null,
+    fireArrivalComment: null,
+    firstBarrelComment: null,
+    additionalForcesComment: null,
+    localizationComment: null,
+    openFireEliminationComment: null,
+    fireConsequencesEliminationComment: null,
+    firestationReturnComment: null,
+  });
+
+  const handleSubmit = (e) => {
+    submitFormFunction({
+      e,
+      cardId,
+      userRoleIsChecker,
+      updateContent: updateFireTimeindicators,
+      updateComment: updateFireTimeindicatorsComment,
+      content: fireTime,
+      comments: fireTimeComment,
     });
-  }, [cardId]);
+  };
+
+  //фетч данных и заполнение ими полей формы (первый хук - конент данных, второй - комментариев)
+
+  useFetch(fetchFireTimeindicators, setFireTime, cardId);
+  useFetch(fetchFireTimeindicatorsComment, setFireTimeComment, cardId);
+
+  //работа с изменением данных в форме
+
+  const changeContentInput = (e) => {
+    setFireTime({
+      ...fireTime,
+      [e.target.dataset.params]: e.target.value,
+    });
+  };
+
+  const changeCommentInput = (e) => {
+    setFireTimeComment({
+      ...fireTimeComment,
+      [e.target.dataset.params]: e.target.value,
+    });
+  };
+
+  function emptyCommentInput(e) {
+    setFireTimeComment({
+      ...fireTimeComment,
+      [e.target.dataset.params]: "",
+    });
+  }
 
   return (
-    <Card className="m-3 p-5 border border-2 border-primary" ref={ref}>
-      <Container className="d-flex align-items-center justify-content-center mb-5">
-        <Row
-          style={{
-            fontSize: "24px",
-            fontWeight: "bold",
-            textAlign: "center",
-          }}
-        >
-          Временные показатели
-        </Row>
-      </Container>
-      <Row
-        className="mx-5"
-        style={{ fontSize: "18px", fontWeight: "bold", textAlign: "center" }}
-      >
-        <div className="d-flex justify-content-between mb-3">
-          <span className="d-inline">Время</span>
-          <span className="d-inline">Площадь возгорания</span>
-        </div>
-      </Row>
-      <Form
-        onSubmit={(e) => {
-          e.preventDefault();
-          updateFireTimeindicators(cardId, {
-            ...fireTime,
-          });
-        }}
-      >
-        <Row className="mb-3">
-          <Form.Group controlId="formFireOccurrence" as={Row}>
-            <Form.Label column sm={3}>
-              возникновения пожара
-            </Form.Label>
-            <Col sm={5}>
-              <Form.Control
-                type="time"
-                placeholder="время возникновения пожара"
-                value={fireTime.fireOccurrenceTime || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    fireOccurrenceTime: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-            <Col sm={4}>
-              <Form.Control
-                type="text"
-                placeholder="площадь"
-                value={fireTime.fireOccurrenceSq || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    fireOccurrenceSq: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-          </Form.Group>
-        </Row>
+    <FormWrapper formLabelName={"Временные показатели"} ref={ref}>
+      <HeadLabelFireTimeRow />
+      <Form onSubmit={handleSubmit}>
+        <OneTimeDateAndOneNumberRow
+          formLabelText={"возникновения пожара"}
+          dataTimeParam={"fireOccurrenceTime"}
+          timeValue={fireTime.fireOccurrenceTime}
+          dataNumberParam={"fireOccurrenceSq"}
+          numberValue={fireTime.fireOccurrenceSq}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"fireOccurrenceComment"}
+          commentplaceHolder={"комментарий к возникновению пожара"}
+          commentValue={fireTimeComment.fireOccurrenceComment}
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
+        <OneTimeDateAndOneNumberRow
+          formLabelText={"обнаружения пожара"}
+          dataTimeParam={"fireDetectionTime"}
+          timeValue={fireTime.fireDetectionTime}
+          dataNumberParam={"fireDetectionSq"}
+          numberValue={fireTime.fireDetectionSq}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"fireDetectionComment"}
+          commentplaceHolder={"комментарий к обнаружению пожара"}
+          commentValue={fireTimeComment.fireDetectionComment}
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
+        <OneTimeDateAndOneNumberRow
+          formLabelText={"сообщения о пожаре"}
+          dataTimeParam={"fireMessageTime"}
+          timeValue={fireTime.fireMessageTime}
+          dataNumberParam={"fireMessageSq"}
+          numberValue={fireTime.fireMessageSq}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"fireMessageComment"}
+          commentplaceHolder={"комментарий к сообщению о пожаре"}
+          commentValue={fireTimeComment.fireMessageComment}
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
+        <OneTimeDateRow
+          formLabelText={"выезда дежурного караула (смены)"}
+          dataTimeParam={"departureTime"}
+          timeValue={fireTime.departureTime}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"departureTimeComment"}
+          commentplaceHolder={"комментарий к времени выезда из ПЧ"}
+          commentValue={fireTimeComment.departureTimeComment}
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
+        <OneTimeDateAndOneNumberRow
+          formLabelText={"прибытия на пожар"}
+          dataTimeParam={"fireArrivalTime"}
+          timeValue={fireTime.fireArrivalTime}
+          dataNumberParam={"fireArrivalSq"}
+          numberValue={fireTime.fireArrivalSq}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"fireArrivalComment"}
+          commentplaceHolder={"комментарий к прибытию на пожар"}
+          commentValue={fireTimeComment.fireArrivalComment}
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
+        <OneTimeDateAndOneNumberRow
+          formLabelText={"подачи первого ствола"}
+          dataTimeParam={"firstBarrelTime"}
+          timeValue={fireTime.firstBarrelTime}
+          dataNumberParam={"firstBarrelSq"}
+          numberValue={fireTime.firstBarrelSq}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"firstBarrelComment"}
+          commentplaceHolder={"комментарий к подачи первого ствола"}
+          commentValue={fireTimeComment.firstBarrelComment}
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
+        <OneTimeDateAndOneNumberRow
+          formLabelText={"вызова дополнительных сил"}
+          dataTimeParam={"additionalForcesTime"}
+          timeValue={fireTime.additionalForcesTime}
+          dataNumberParam={"additionalForcesSq"}
+          numberValue={fireTime.additionalForcesSq}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"additionalForcesComment"}
+          commentplaceHolder={"комментарий к вызову дополнительных сил"}
+          commentValue={fireTimeComment.additionalForcesComment}
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
+        <OneTimeDateAndOneNumberRow
+          formLabelText={"локализация"}
+          dataTimeParam={"localizationTime"}
+          timeValue={fireTime.localizationTime}
+          dataNumberParam={"localizationSq"}
+          numberValue={fireTime.localizationSq}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"localizationComment"}
+          commentplaceHolder={"комментарий к локализации"}
+          commentValue={fireTimeComment.localizationComment}
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
+        <OneTimeDateAndOneNumberRow
+          formLabelText={"ликвидация открытого горения"}
+          dataTimeParam={"openFireEliminationTime"}
+          timeValue={fireTime.openFireEliminationTime}
+          dataNumberParam={"openFireEliminationSq"}
+          numberValue={fireTime.openFireEliminationSq}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"openFireEliminationComment"}
+          commentplaceHolder={"комментарий к ликвидации открытого горения"}
+          commentValue={fireTimeComment.openFireEliminationComment}
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
+        <OneTimeDateRow
+          formLabelText={"ликвидация последствий пожара"}
+          dataTimeParam={"fireConsequencesEliminationTime"}
+          timeValue={fireTime.fireConsequencesEliminationTime}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"fireConsequencesEliminationComment"}
+          commentplaceHolder={"комментарий к ликвидации последствий пожара"}
+          commentValue={fireTimeComment.fireConsequencesEliminationComment}
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
+        <OneTimeDateRow
+          formLabelText={"возвращения в часть (место постоянной дислокации)"}
+          dataTimeParam={"firestationReturnTime"}
+          timeValue={fireTime.firestationReturnTime}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"firestationReturnComment"}
+          commentplaceHolder={
+            "комментарий к возвращению в часть (место постоянной дислокации)"
+          }
+          commentValue={fireTimeComment.firestationReturnComment}
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
 
-        <Row className="mb-3">
-          <Form.Group controlId="formFireDetection" as={Row}>
-            <Form.Label column sm={3}>
-              обнаружения пожара
-            </Form.Label>
-            <Col sm={5}>
-              <Form.Control
-                type="time"
-                placeholder="время обнаружения пожара"
-                value={fireTime.fireDetectionTime || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    fireDetectionTime: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-            <Col sm={4}>
-              <Form.Control
-                type="text"
-                placeholder="площадь"
-                value={fireTime.fireDetectionSq || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    fireDetectionSq: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-          </Form.Group>
-        </Row>
-
-        <Row className="mb-3">
-          <Form.Group controlId="formFireMessage" as={Row}>
-            <Form.Label column sm={3}>
-              обнаружения пожара
-            </Form.Label>
-            <Col sm={5}>
-              <Form.Control
-                type="time"
-                placeholder="время сообщения о пожаре"
-                value={fireTime.fireMessageTime || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    fireMessageTime: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-            <Col sm={4}>
-              <Form.Control
-                type="text"
-                placeholder="площадь"
-                value={fireTime.fireMessageSq || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    fireMessageSq: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-          </Form.Group>
-        </Row>
-
-        <Row className="mb-3">
-          <Form.Group controlId="formDeparture" as={Row}>
-            <Form.Label column sm={3}>
-              выезда дежурного караула (смены)
-            </Form.Label>
-            <Col sm={5}>
-              <Form.Control
-                type="time"
-                placeholder="время выезда из ПЧ"
-                value={fireTime.departureTime || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    departureTime: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-          </Form.Group>
-        </Row>
-
-        <Row className="mb-3">
-          <Form.Group controlId="formFireArrival" as={Row}>
-            <Form.Label column sm={3}>
-              прибытия на пожар
-            </Form.Label>
-            <Col sm={5}>
-              <Form.Control
-                type="time"
-                placeholder="время прибытия на пожар"
-                value={fireTime.fireArrivalTime || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    fireArrivalTime: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-            <Col sm={4}>
-              <Form.Control
-                type="text"
-                placeholder="площадь"
-                value={fireTime.fireArrivalSq || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    fireArrivalSq: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-          </Form.Group>
-        </Row>
-
-        <Row className="mb-3">
-          <Form.Group controlId="formFirstBarrel" as={Row}>
-            <Form.Label column sm={3}>
-              подачи первого ствола
-            </Form.Label>
-            <Col sm={5}>
-              <Form.Control
-                type="time"
-                placeholder="время подачи первого ствола"
-                value={fireTime.firstBarrelTime || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    firstBarrelTime: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-            <Col sm={4}>
-              <Form.Control
-                type="text"
-                placeholder="площадь"
-                value={fireTime.firstBarrelSq || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    firstBarrelSq: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-          </Form.Group>
-        </Row>
-
-        <Row className="mb-3">
-          <Form.Group controlId="formAdditionalForces" as={Row}>
-            <Form.Label column sm={3}>
-              вызова дополнительных сил
-            </Form.Label>
-            <Col sm={5}>
-              <Form.Control
-                type="time"
-                placeholder="время вызова дополнительных сил"
-                value={fireTime.additionalForcesTime || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    additionalForcesTime: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-            <Col sm={4}>
-              <Form.Control
-                type="text"
-                placeholder="площадь"
-                value={fireTime.additionalForcesSq || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    additionalForcesSq: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-          </Form.Group>
-        </Row>
-
-        <Row className="mb-3">
-          <Form.Group controlId="formLocalization" as={Row}>
-            <Form.Label column sm={3}>
-              локализация
-            </Form.Label>
-            <Col sm={5}>
-              <Form.Control
-                type="time"
-                placeholder="время локализации"
-                value={fireTime.localizationTime || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    localizationTime: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-            <Col sm={4}>
-              <Form.Control
-                type="text"
-                placeholder="площадь"
-                value={fireTime.localizationSq || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    localizationSq: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-          </Form.Group>
-        </Row>
-
-        <Row className="mb-3">
-          <Form.Group controlId="formOpenFireElimination" as={Row}>
-            <Form.Label column sm={3}>
-              ликвидация открытого горения
-            </Form.Label>
-            <Col sm={5}>
-              <Form.Control
-                type="time"
-                placeholder="время ликвидации открытого горения"
-                value={fireTime.openFireEliminationTime || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    openFireEliminationTime: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-            <Col sm={4}>
-              <Form.Control
-                type="text"
-                placeholder="площадь"
-                value={fireTime.openFireEliminationSq || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    openFireEliminationSq: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-          </Form.Group>
-        </Row>
-
-        <Row className="mb-3">
-          <Form.Group controlId="formFireConsequencesElimination" as={Row}>
-            <Form.Label column sm={3}>
-              ликвидация последствий пожара
-            </Form.Label>
-            <Col sm={5}>
-              <Form.Control
-                type="time"
-                placeholder="время ликвидации последствий пожара"
-                value={fireTime.fireConsequencesEliminationTime || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    fireConsequencesEliminationTime: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-          </Form.Group>
-        </Row>
-
-        <Row className="mb-3">
-          <Form.Group controlId="formFirestationReturnTime" as={Row}>
-            <Form.Label column sm={3}>
-              возвращения в часть (место постоянной дислокации)
-            </Form.Label>
-            <Col sm={5}>
-              <Form.Control
-                type="time"
-                placeholder="время возвращения в часть (место постоянной дислокации)"
-                value={fireTime.firestationReturnTime || ""}
-                onChange={(e) => {
-                  setFireTime({
-                    ...fireTime,
-                    firestationReturnTime: e.target.value,
-                  });
-                }}
-              />
-            </Col>
-          </Form.Group>
-        </Row>
-
-        <Row>
-          <Col>{}</Col>
-          <Col className="d-flex justify-content-end">
-            <Button
-              type="submit"
-              variant="primary"
-              className="ml-auto"
-              style={{ marginRight: "24px" }}
-              size="lg"
-            >
-              Отправить
-            </Button>
-          </Col>
-        </Row>
+        <FormSendButton />
       </Form>
-    </Card>
+    </FormWrapper>
   );
 });
 
