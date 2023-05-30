@@ -9,11 +9,11 @@ import UserStore from "./store/UserStore";
 export const Context = createContext(null);
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <>
+  <StrictMode>
     <Context.Provider value={{ userInfo: new UserStore() }}>
       <App />
     </Context.Provider>
-  </>
+  </StrictMode>
 );
 
 //StrictMode

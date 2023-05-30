@@ -12,7 +12,7 @@ const CreatingButton = observer(() => {
   const [createState, setCreateState] = useState({
     userId: userInfo.userId,
     shift: "",
-    callDate: "",
+    callDate: new Date(),
     objectName: "",
     settlement: "",
     address: "",
