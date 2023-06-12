@@ -26,6 +26,14 @@ class WaterSupplyController {
     return;
   }
 
+  async getCardInfo(req, res) {
+    const { cardId } = req.params;
+    const data = await WaterSupply.findOne({
+      where: { cardId },
+    });
+    return data;
+  }
+
   async getOne(req, res) {
     const { cardId } = req.params;
     const waterSupply = await WaterSupply.findOne({

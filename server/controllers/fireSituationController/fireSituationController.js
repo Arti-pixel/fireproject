@@ -14,6 +14,14 @@ class FireSituationController {
     return;
   }
 
+  async getCardInfo(req, res) {
+    const { cardId } = req.params;
+    const data = await FireSituation.findOne({
+      where: { cardId },
+    });
+    return data;
+  }
+
   async getOne(req, res) {
     const { cardId } = req.params;
     const situation = await FireSituation.findOne({

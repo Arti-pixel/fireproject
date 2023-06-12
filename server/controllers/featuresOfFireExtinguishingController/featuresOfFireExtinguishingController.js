@@ -26,6 +26,14 @@ class FeaturesOfFireExtinguishingController {
     return;
   }
 
+  async getCardInfo(req, res) {
+    const { cardId } = req.params;
+    const data = await FeaturesOfFireExtinguishing.findOne({
+      where: { cardId },
+    });
+    return data;
+  }
+
   async getOne(req, res) {
     const { cardId } = req.params;
     const featuresOfExtinguishing = await FeaturesOfFireExtinguishing.findOne({

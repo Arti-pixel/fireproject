@@ -21,9 +21,12 @@
     "express": "^4.18.2",
     "express-fileupload": "^1.4.0",
     "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.4",
     "nginx": "^1.0.8",
+    "pdfmake": "^0.2.7",
     "pg": "^8.10.0",
     "pg-hstore": "^2.3.4",
+    "roboto-font": "^0.1.0",
     "sequelize": "^6.31.0",
     "uuid": "^9.0.0"
   },

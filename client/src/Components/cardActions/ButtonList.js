@@ -5,6 +5,7 @@ import { ButtonGroup, DropdownButton, Dropdown } from "react-bootstrap";
 import { CARD_ROUTE } from "../../utils/consts";
 import DeleteModal from "./actionsModals/DeleteModal";
 import { Context } from "../../index";
+import { getRecordsPdf } from "../../http/cardInfoAPI";
 
 const ButtonList = observer(({ cardId, currentState }) => {
   const { userInfo } = useContext(Context);
@@ -66,7 +67,9 @@ const ButtonList = observer(({ cardId, currentState }) => {
               {currentState === "checked" && (
                 <Dropdown.Item
                   eventKey="pdf"
-                  // onClick={}
+                  onClick={() => {
+                    getRecordsPdf(cardId);
+                  }}
                 >
                   Перевести в pdf на печать
                 </Dropdown.Item>

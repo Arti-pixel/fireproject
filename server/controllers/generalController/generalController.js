@@ -265,6 +265,14 @@ class GeneralController {
     });
   }
 
+  async getCardInfo(req, res) {
+    const { cardId } = req.params;
+    const data = await General.findOne({
+      where: { cardId },
+    });
+    return data;
+  }
+
   async update(req, res) {
     const { cardId } = req.params;
     const {

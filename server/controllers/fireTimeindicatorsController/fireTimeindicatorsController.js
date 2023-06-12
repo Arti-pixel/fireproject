@@ -62,6 +62,14 @@ class FireTimeindicatorsController {
     return res.json(fireTimeindicator);
   }
 
+  async getCardInfo(req, res) {
+    const { cardId } = req.params;
+    const data = await FireTimeindicators.findOne({
+      where: { cardId },
+    });
+    return data;
+  }
+
   async checkCommentsExistence(req, res) {
     return new Promise((resolve, reject) => {
       const { cardId } = req.params;

@@ -14,6 +14,14 @@ class ApplicationNameController {
     return;
   }
 
+  async getCardInfo(req, res) {
+    const { cardId } = req.params;
+    const data = await ApplicationName.findOne({
+      where: { cardId },
+    });
+    return data;
+  }
+
   async getOne(req, res) {
     const { cardId } = req.params;
     const appName = await ApplicationName.findOne({

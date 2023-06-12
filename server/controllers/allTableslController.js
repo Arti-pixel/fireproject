@@ -40,6 +40,25 @@ class AllTableslController {
     return res.json(cardId);
   }
 
+  async getCardInfo(req, res) {
+    const promises = {};
+    promises["ApplicationImageController"] = [];
+
+    for (const item of controllerArray) {
+      await item.getCardInfo(req, res).then((promise) => {
+        if (!Array.isArray(promise)) {
+          promises[item.constructor.name] = promise.dataValues;
+        } else {
+          for (const element of promise) {
+            promises["ApplicationImageController"].push(element.dataValues);
+          }
+        }
+      });
+    }
+
+    return promises;
+  }
+
   async checkCommentsExistence(req, res) {
     let commentsExists = false;
     const promises = [];

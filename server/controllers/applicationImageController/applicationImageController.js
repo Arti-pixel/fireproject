@@ -49,6 +49,14 @@ class ApplicationImageController {
     });
   }
 
+  async getCardInfo(req, res) {
+    const { cardId } = req.params;
+    const data = await ApplicationImage.findAll({
+      where: { cardId },
+    });
+    return data;
+  }
+
   async delete(req, res, next) {
     try {
       const { cardId } = req.params;

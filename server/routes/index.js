@@ -5,6 +5,8 @@ const userRouter = require("./userRouter");
 
 const allTablesRouter = require("./allTablesRouter");
 
+const pdfmakeRouter = require("./pdfmakeRouter");
+
 const generalRouter = require("./generalRouter/generalRouter");
 const generalCommentRouter = require("./generalRouter/generalCommentRouter");
 
@@ -42,6 +44,8 @@ const applicationImageRouter = require("./applicationImageRouter/applicationImag
 const applicationImageCommentRouter = require("./applicationImageRouter/applicationImageCommentRouter");
 
 router.use("/allTables", allTablesRouter);
+
+router.use("/pdf", pdfmakeRouter);
 
 router.use("/user", userRouter);
 

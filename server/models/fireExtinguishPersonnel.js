@@ -22,6 +22,10 @@ const FireExtinguishPersonnel = sequelize.define(
       type: DataTypes.TEXT,
     },
 
+    fireExtinguishLargeFires: {
+      type: DataTypes.TEXT,
+    },
+
     fireExtinguishWithGasAndSmokeProtectionService: {
       type: DataTypes.TEXT,
     },
@@ -54,6 +58,10 @@ const FireExtinguishPersonnelComment = sequelize.define(
     },
 
     fireExtinguishPersonnelComment: {
+      type: DataTypes.TEXT,
+    },
+
+    fireExtinguishLargeFiresComment: {
       type: DataTypes.TEXT,
     },
 

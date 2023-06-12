@@ -7,6 +7,7 @@ class FireExtinguishPersonnelController {
       cardId,
       fireExtinguishPersonnel = null,
       fireExtinguishTech = null,
+      fireExtinguishLargeFires = null,
       fireExtinguishWithGasAndSmokeProtectionService = null,
       OnesquadOfFirefighters = null,
       TwosquadOfFirefighters = null,
@@ -17,6 +18,7 @@ class FireExtinguishPersonnelController {
       cardId,
       fireExtinguishPersonnel,
       fireExtinguishTech,
+      fireExtinguishLargeFires,
       fireExtinguishWithGasAndSmokeProtectionService,
       OnesquadOfFirefighters,
       TwosquadOfFirefighters,
@@ -24,6 +26,14 @@ class FireExtinguishPersonnelController {
     });
     // return res.json(fireTimeindicator);
     return;
+  }
+
+  async getCardInfo(req, res) {
+    const { cardId } = req.params;
+    const data = await FireExtinguishPersonnel.findOne({
+      where: { cardId },
+    });
+    return data;
   }
 
   async getOne(req, res) {
@@ -55,6 +65,7 @@ class FireExtinguishPersonnelController {
     const {
       fireExtinguishPersonnel,
       fireExtinguishTech,
+      fireExtinguishLargeFires,
       fireExtinguishWithGasAndSmokeProtectionService,
       OnesquadOfFirefighters,
       TwosquadOfFirefighters,
@@ -65,6 +76,7 @@ class FireExtinguishPersonnelController {
         {
           fireExtinguishPersonnel,
           fireExtinguishTech,
+          fireExtinguishLargeFires,
           fireExtinguishWithGasAndSmokeProtectionService,
           OnesquadOfFirefighters,
           TwosquadOfFirefighters,

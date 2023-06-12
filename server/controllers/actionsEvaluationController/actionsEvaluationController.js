@@ -26,6 +26,14 @@ class ActionsEvaluationController {
     return;
   }
 
+  async getCardInfo(req, res) {
+    const { cardId } = req.params;
+    const data = await ActionsEvaluation.findOne({
+      where: { cardId },
+    });
+    return data;
+  }
+
   async getOne(req, res) {
     const { cardId } = req.params;
     const actionEvaluation = await ActionsEvaluation.findOne({

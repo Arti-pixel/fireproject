@@ -23,6 +23,7 @@ const FireExtinguishPersonnelForm = forwardRef(({}, ref) => {
   const [fireExtinguishPersonnel, setFireExtinguishPersonnel] = useState({
     fireExtinguishPersonnel: null,
     fireExtinguishTech: null,
+    fireExtinguishLargeFires: null,
     fireExtinguishWithGasAndSmokeProtectionService: null,
     OnesquadOfFirefighters: null,
     TwosquadOfFirefighters: null,
@@ -33,6 +34,7 @@ const FireExtinguishPersonnelForm = forwardRef(({}, ref) => {
     useState({
       fireExtinguishPersonnelComment: null,
       fireExtinguishTechComment: null,
+      fireExtinguishLargeFiresComment: null,
       fireExtinguishWithGasAndSmokeProtectionServiceComment: null,
       OnesquadOfFirefightersComment: null,
       TwosquadOfFirefightersComment: null,
@@ -118,7 +120,7 @@ const FireExtinguishPersonnelForm = forwardRef(({}, ref) => {
           commentEmptyFun={emptyCommentInput}
         />
         <OneTextRow
-          dataContentParam={"fireExtinguishWithGasAndSmokeProtectionService"}
+          dataContentParam={"fireExtinguishLargeFires"}
           contentLabelText={
             "С использованием сил и средств опорных пунктов тушения крупных пожаров"
           }
@@ -126,6 +128,23 @@ const FireExtinguishPersonnelForm = forwardRef(({}, ref) => {
           contentPlaceholder={
             "силы и средствa опорных пунктов тушения крупных пожаров"
           }
+          contentValue={fireExtinguishPersonnel.fireExtinguishLargeFires}
+          contentChangeFun={changeContentInput}
+          dataCommentParam={"fireExtinguishLargeFiresComment"}
+          commentplaceHolder={
+            "комментарий к силам и средствaм опорных пунктов тушения крупных пожаров"
+          }
+          commentValue={
+            fireExtinguishPersonnelComment.fireExtinguishLargeFiresComment
+          }
+          commentChangeFun={changeCommentInput}
+          commentEmptyFun={emptyCommentInput}
+        />
+        <OneTextRow
+          dataContentParam={"fireExtinguishWithGasAndSmokeProtectionService"}
+          contentLabelText={"С применением ГДЗС"}
+          contentFieldType={"input"}
+          contentPlaceholder={"звена ГДЗС"}
           contentValue={
             fireExtinguishPersonnel.fireExtinguishWithGasAndSmokeProtectionService
           }
@@ -133,9 +152,7 @@ const FireExtinguishPersonnelForm = forwardRef(({}, ref) => {
           dataCommentParam={
             "fireExtinguishWithGasAndSmokeProtectionServiceComment"
           }
-          commentplaceHolder={
-            "комментарий к силам и средствaм опорных пунктов тушения крупных пожаров"
-          }
+          commentplaceHolder={"комментарий к звенам ГДЗС"}
           commentValue={
             fireExtinguishPersonnelComment.fireExtinguishWithGasAndSmokeProtectionServiceComment
           }
