@@ -1,4 +1,4 @@
-const generalController = require("../controllers/generalController/generalController");
+const generalController = require("./generalController/generalController");
 const fireTimeindicatorsController = require("./fireTimeindicatorsController/fireTimeindicatorsController");
 const waterSupplyController = require("./waterSupplyController/waterSupplyController");
 const fireSituationController = require("./fireSituationController/fireSituationController");

@@ -82,7 +82,7 @@ const Auth = observer(() => {
               {isLogin ? (
                 <div>
                   Нет аккаунта?
-                  <NavLink to={REGISTRATION_ROUTE}>Зарегестрируйтесь!</NavLink>
+                  <NavLink to={REGISTRATION_ROUTE}>Зарегистрируйтесь!</NavLink>
                 </div>
               ) : (
                 <div>

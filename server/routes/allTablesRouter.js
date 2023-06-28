@@ -1,6 +1,6 @@
 const Router = require("express");
 const router = new Router();
-const allTablesController = require("../controllers/allTableslController");
+const allTablesController = require("../controllers/allTablesController");
 const checkRole = require("../middleware/checkRoleMiddleware");
 
 router.post("/", checkRole("user"), allTablesController.create);

@@ -1,5 +1,5 @@
 const uuid = require("uuid");
-const allTables = require("../controllers/allTableslController");
+const allTables = require("./allTablesController");
 const moment = require("moment");
 const path = require("path");
 const fs = require("fs");
